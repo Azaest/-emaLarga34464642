@@ -783,9 +783,10 @@
       <div class="struct-card"><div class="struct-tag"><div class="s-name">Almacén</div><div class="s-cost">250 CR</div></div><div class="struct-body">Permite guardar hasta <strong>5 objetos</strong> de inventario de la sede, accesibles por cualquier miembro activo pero, para sustraer los mismos se requiere permiso del líder.</div></div>
 
       <div class="inner-head">Nivel II — Desde Sede Cat. II</div>
-      <div class="struct-card"><div class="struct-tag"><div class="s-name">Centro de Inteligencia</div><div class="s-cost">700 CR</div></div><div class="struct-body">...</div></div>
-      <div class="struct-card"><div class="struct-tag"><div class="s-name">Armería</div><div class="s-cost">800 CR</div></div><div class="struct-body">Reduce un <strong>25%</strong> el costo en CR de adquisición de equipamiento en tiendas para todos los miembros.</div></div>
-      <div class="struct-card"><div class="struct-tag"><div class="s-name">Laboratorio</div><div class="s-cost">900 CR</div></div><div class="struct-body">Requisito para que perfiles intelecto lleven a cabo legalizaciones de inventos dentro de la agrupación.<div class="s-notes">⭙ Necesario para perfiles científicos y tecnológicos.<br>⭙ Es posible otorgar permiso a alguien externo de la agrupación para que lo emplee.</div></div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Centro de Inteligencia</div><div class="s-cost">700 CR</div></div><div class="struct-body">Aumenta en un 10% la EXP que obtienen los miembros de la Agrupación por Operativos Grupales.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Armería</div><div class="s-cost">800 CR</div></div><div class="struct-body">Aumenta en un 10% el daño para los miembros que posean el Perfil: Armas de Fuego. Otorga ... </div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Laboratorio</div><div class="s-cost">900 CR</div></div><div class="struct-body">Requisito para que perfiles intelecto lleven a cabo legalizaciones de inventos. El cálculo de CO pasa a ser EXP/45 para los que posean el Perfil: Cíentifico en la Agrupación<div class="s-notes">⭙ Necesario para perfiles científicos y tecnológicos.<br>⭙ Es posible otorgar permiso a alguien externo de la agrupación para que lo emplee.</div></div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Gimnasio</div><div class="s-cost">800 CR</div></div><div class="struct-body">Aumenta en un 10% el daño para los miembros que posean el Perfil: Luchador/Armas de Filo. Otorga ... </div></div>
       <div class="struct-card"><div class="struct-tag"><div class="s-name">Cuartel</div><div class="s-cost">600 CR</div></div><div class="struct-body">Aumenta el límite máximo de miembros en <strong>+1</strong>. Compras ilimitadas y <em>no ocupa Espacio de Construcción</em>.</div></div>
 
       <div class="inner-head">Nivel III — Desde Sede Cat. III</div>
@@ -793,6 +794,7 @@
       <div class="struct-card"><div class="struct-tag"><div class="s-name">Bunker Reforzado</div><div class="s-cost">1.600 CR</div></div><div class="struct-body">En caso de declaración de Guerra al Territorio de la Sede se obtiene un <strong>+10% [x1.10]</strong> de daño que supera límite.</div></div>
       <div class="struct-card"><div class="struct-tag"><div class="s-name">Clínica Avanzada</div><div class="s-cost">1.200 CR</div></div><div class="struct-body">Amplía la Enfermería Básica: aumenta la recuperación de Vigor anterior en <strong>+2</strong> y permite una vez cada 31 días intentar salvar a alguien de la muerte mediante una tirada. <em>Sustituye a la Enfermería Básica.</em><div class="s-notes">⭙ Para llevar a cabo la salvación se deberá tener en cuenta lo siguiente; no funciona en decapitaciones, obliteraciones, borrados de la realidad, ante cualquier duda consultar con moderación.<br></div></div></div>
       <div class="struct-card"><div class="struct-tag"><div class="s-name">Archivo Clasificado</div><div class="s-cost">1.000 CR</div></div><div class="struct-body">Permite almacenar información que se obtenga on rol (documentos, planos, rumores, etc). Su efecto es meramente interpretativo y algo que Narración puede tener en cuenta en ciertos Eventos.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Zona de Construcción</div><div class="s-cost">2.500 CR</div></div><div class="struct-body">Aumenta en +1 los espacios de construcción una sede. Como máximo se podrá ampliar a un 100% [x2] la capacidad original que posee la categoria en la que esté la sede. No ocupa espacio de construcción.</div></div>
 
       <div class="inner-head">Nivel IV — Desde Sede Cat. IV</div>
       <div class="struct-card"><div class="struct-tag"><div class="s-name">Centro de Mando</div><div class="s-cost">2.500 CR</div></div><div class="struct-body">Todos los operativos otorgan <strong>+10% de PDP</strong> adicionales.</div></div>
@@ -994,104 +996,13 @@
     </div>
   </div>
 
-  <!-- ══ 08 — EDIFICIOS DE TERRITORIO ══ -->
-  <div class="punto" id="p8">
+  <!-- ══ 09 — JUGADORES SOLITARIOS ══ -->
+  <div class="punto" id="p9">
     <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
       <div class="punto-num">08</div>
       <div class="punto-header-inner">
         <div class="punto-title-wrap">
           <div class="punto-label">Sección 8</div>
-          <div class="punto-title">Edificios de Territorio</div>
-        </div>
-        <div class="punto-tags">
-          <span class="badge badge-red">Edificaciones Especiales</span>
-          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-      </div>
-    </button>
-    <div class="punto-body">
-      <div class="punto-intro">Después de canjeado Dominio (Mejora de PDP), las agrupaciones pueden construir edificios en los territorios que controlan. Son construcciones permanentes ligadas al territorio, no a la sede. Si el territorio es conquistado, los edificios pasan a manos del nuevo dueño. Los territorios tienen un coste de manuntención que será reflejado en el mismo al momento de completar una conquista.</div>
-
-      <div class="alerta"><strong>Sistema básico → derivado</strong> — Cada territorio tiene <strong>2 huecos de construcción</strong> por defecto. El edificio derivado sustituye al básico ocupando el mismo hueco, no uno adicional.</div>
-
-      <div class="inner-head" style="margin-top:18px;">Clínica de Campo → Centro Médico</div>
-      <div class="building-card">
-        <div class="building-row basico">
-          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Clínica de Campo</div></div>
-          <div class="building-body"><div class="building-desc">Instalación médica de emergencia en el territorio. Reduce un <strong>20%</strong> el tiempo de recuperación de Vigor.</div><div class="building-cost">1.000 CR</div></div>
-        </div>
-        <div class="building-row derivado">
-          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Centro Médico</div></div>
-          <div class="building-body"><div class="building-desc">Ampliación completa. Reduce un <strong>40%</strong> el tiempo de recuperación de Vigor.</div><div class="building-cost">+2.000 CR adicionales</div></div>
-        </div>
-      </div>
-
-      <div class="inner-head">Almacén Logístico → Centro de Distribución</div>
-      <div class="building-card">
-        <div class="building-row basico">
-          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Almacén Logístico</div></div>
-          <div class="building-body"><div class="building-desc">Genera <strong>200 CR pasivos</strong> al inicio de cada semana.</div><div class="building-cost">1.200 CR</div></div>
-        </div>
-        <div class="building-row derivado">
-          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Centro de Distribución</div></div>
-          <div class="building-body"><div class="building-desc">Genera <strong>500 CR pasivos</strong> al inicio de semana y reduce un <strong>10%</strong> el costo de todas las compras de estructuras de sede.</div><div class="building-cost">+2.500 CR adicionales</div></div>
-        </div>
-      </div>
-
-      <div class="inner-head">Taller → Forja Avanzada</div>
-      <div class="building-card">
-        <div class="building-row basico">
-          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Taller</div></div>
-          <div class="building-body"><div class="building-desc">Permite llevar a cabo legalizaciones de objetos sin necesidad de acudir al Laboratorio de la sede. Será necesario nombrar a un Encargado, quien será el que envie las legalizaciones mediante Ticket a Moderación.</div><div class="building-cost">1.200 CR</div></div>
-        </div>
-        <div class="building-row derivado">
-          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Forja Avanzada</div></div>
-          <div class="building-body"><div class="building-desc">Equivalente al Laboratorio de Alto Nivel. Permite legalizar objetos de categoría ... sin necesidad de poseer el Perfil: Cientifico.</div><div class="building-cost">+1.800 CR adicionales</div></div>
-        </div>
-      </div>
-
-      <div class="inner-head">Puesto de Vigilancia → Torre de Control</div>
-      <div class="building-card">
-        <div class="building-row basico">
-          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Puesto de Vigilancia</div></div>
-          <div class="building-body"><div class="building-desc">La agrupación intercepta la declaración de guerra de una agrupación enemiga, anulando todos sus operativos y teniendo esta que re-hacerlos para llevar a cabo una vez más la declaración de Guerra.</div><div class="building-cost">600 CR</div></div>
-        </div>
-        <div class="building-row derivado">
-          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Torre de Control</div></div>
-          <div class="building-body"><div class="building-desc">Además de lo anterior, ...</div><div class="building-cost">+1.200 CR adicionales</div></div>
-        </div>
-      </div>
-
-      <div class="inner-head">Centro Comunitario → Sede Gubernamental</div>
-      <div class="building-card">
-        <div class="building-row basico">
-          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Centro Comunitario</div></div>
-          <div class="building-body"><div class="building-desc">eh no se ayuda.</div><div class="building-cost">1.000 CR</div><div class="building-notes">⭙ Solo disponible para alineamiento Legal.</div></div>
-        </div>
-        <div class="building-row derivado">
-          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Sede Gubernamental</div></div>
-          <div class="building-body"><div class="building-desc">eh no se ayuda.</div><div class="building-cost">+2.000 CR adicionales</div><div class="building-notes">⭙ Requiere haber dominado el territorio durante al menos 2 meses consecutivos.</div></div>
-        </div>
-      </div>
-
-      <div class="inner-head">Red de Contactos</div>
-      <div class="struct-card" style="border-left-color:var(--red);">
-        <div class="struct-tag"><div class="s-name">Red de Contactos</div><div class="s-cost">1.100 CR</div></div>
-        <div class="struct-body">
-          Infraestructura de información y tráfico paralelo. Permite generar <strong>...</strong> </em>
-          <div class="s-notes">⭙ Solo disponible para alineamiento Neutral o Maligno.<br>⭙ Requiere haber desbloqueado Información Clasificada (mejora de PDP).</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ 09 — JUGADORES SOLITARIOS ══ -->
-  <div class="punto" id="p9">
-    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
-      <div class="punto-num">09</div>
-      <div class="punto-header-inner">
-        <div class="punto-title-wrap">
-          <div class="punto-label">Sección 9</div>
           <div class="punto-title">Solitarios</div>
         </div>
         <div class="punto-tags">
