@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marvel Hobba RPG — Sistema de Agrupaciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Rajdhani:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0a0a0a;
+    --surface:   #111111;
+    --card:      #181818;
+    --border:    #2a2a2a;
+    --red:       #c0392b;
+    --red-dim:   #7a1e15;
+    --gold:      #c9a227;
+    --green:     #39c463;
+    --white:     #e8e8e0;
+    --gray:      #a0a0a0;
+    --lightgray: #c8c8c0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  .masthead {
+    background: var(--red);
+    padding: 18px 32px 28px;
+    margin-bottom: 0;
+  }
+  .masthead-inner { display: flex; align-items: center; gap: 20px; }
+  .masthead-logo {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(22px, 5vw, 38px);
+    letter-spacing: 0.06em;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .masthead-logo span {
+    display: block;
+    font-size: 0.4em;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .masthead-image-zone {
+    width: 100%;
+    background: #0d0d0d;
+    border-left: 4px solid var(--red);
+    border-right: 4px solid var(--red);
+    border-bottom: 2px solid var(--red-dim);
+    overflow: hidden;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+  .masthead-image-zone img { width: 100%; height: auto; display: block; object-fit: cover; max-height: 320px; }
+  .masthead-image-zone .img-placeholder {
+    padding: 20px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    border: 1px dashed rgba(192,57,43,0.3);
+    margin: 12px;
+    text-align: center;
+  }
+
+  .tip {
+    position: relative;
+    cursor: help;
+    color: var(--red);
+    border-bottom: 1px dashed rgba(192,57,43,0.5);
+    transition: color 0.15s, border-color 0.15s;
+    white-space: normal;
+  }
+  .tip:hover { color: #e04535; border-bottom-color: var(--red); }
+
+  #tip-popup {
+    position: fixed;
+    z-index: 9999;
+    background: #161616;
+    border: 1px solid var(--red-dim);
+    border-left: 3px solid var(--red);
+    color: var(--lightgray);
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-style: normal;
+    line-height: 1.65;
+    letter-spacing: 0;
+    max-width: 300px;
+    min-width: 160px;
+    padding: 10px 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.7);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.16s ease;
+  }
+  #tip-popup.visible { opacity: 1; }
+  #tip-popup::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    border: 6px solid transparent;
+  }
+  #tip-popup.dir-up::before { top: 100%; border-top-color: var(--red-dim); }
+  #tip-popup.dir-down::before { bottom: 100%; border-bottom-color: var(--red-dim); }
+
+  .intro-band {
+    background: var(--surface);
+    border-left: 4px solid var(--red);
+    padding: 24px 28px;
+    margin-top: 24px;
+    margin-bottom: 32px;
+  }
+  .intro-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(20px, 4vw, 32px);
+    letter-spacing: 0.04em;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .intro-desc { font-size: 13px; color: var(--lightgray); line-height: 1.75; max-width: 680px; }
+
+  .section-divider {
+    display: flex; align-items: center; gap: 12px; margin: 24px 0 8px;
+  }
+  .section-divider .line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--red-dim), transparent); }
+
+  .punto {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--red-dim);
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .punto::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 60px; height: 60px;
+    background: radial-gradient(circle at top right, rgba(192,57,43,0.1), transparent 70%);
+    pointer-events: none;
+  }
+
+  .punto-trigger {
+    display: flex; align-items: center; gap: 0;
+    width: 100%; background: none; border: none; cursor: pointer;
+    padding: 0; text-align: left; color: var(--white);
+  }
+  .punto-trigger:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
+
+  .punto-num {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 11px; letter-spacing: 0.18em; color: var(--red);
+    background: rgba(192,57,43,0.12);
+    border-right: 1px solid var(--red-dim);
+    padding: 14px 16px; min-width: 56px; text-align: center;
+    flex-shrink: 0; align-self: stretch;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .punto-header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    flex: 1; padding: 14px 18px;
+    background: rgba(192,57,43,0.08);
+    transition: background 0.2s;
+  }
+  .punto-trigger:hover .punto-header-inner,
+  .punto[open] .punto-header-inner { background: rgba(192,57,43,0.14); }
+
+  .punto-title-wrap { display: flex; flex-direction: column; gap: 2px; }
+  .punto-label {
+    font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray);
+  }
+  .punto-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(13px, 2.5vw, 16px); letter-spacing: 0.06em;
+    color: var(--white); line-height: 1.15;
+  }
+
+  .punto-tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+  .punto-chevron {
+    width: 18px; height: 18px; flex-shrink: 0; margin-left: 14px;
+    color: var(--red);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .punto[open] .punto-chevron { transform: rotate(180deg); }
+
+  .punto-body {
+    display: none; padding: 20px 18px 20px;
+    border-top: 1px solid var(--border);
+    animation: slide-down 0.22s ease-out;
+  }
+  .punto[open] .punto-body { display: block; }
+  @keyframes slide-down {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .regla {
+    margin-bottom: 14px; padding: 12px 16px;
+    background: rgba(0,0,0,0.28);
+    border-left: 3px solid var(--red-dim);
+  }
+  .regla.gold   { border-left-color: var(--gold); }
+  .regla.green  { border-left-color: var(--green); }
+  .regla.blue   { border-left-color: #5566ff; }
+  .regla.dim    { border-left-color: #444; background: rgba(0,0,0,0.15); opacity: 0.85; }
+
+  .regla-name {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 5px;
+  }
+  .regla-name.red   { color: var(--red); }
+  .regla-name.green { color: var(--green); }
+  .regla-name.white { color: var(--white); }
+  .regla-name.blue  { color: #8899ff; }
+
+  .regla-text { font-size: 13px; color: var(--lightgray); line-height: 1.7; }
+  .regla-text strong { color: var(--white); }
+  .regla-text em     { color: var(--gold); font-style: normal; }
+  .regla-text ul { margin: 6px 0 0 16px; }
+  .regla-text ul li { margin-bottom: 4px; }
+
+  .inner-head {
+    font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.2em; color: var(--gray); text-transform: uppercase;
+    padding: 6px 0 8px; border-bottom: 1px solid var(--border);
+    margin: 18px 0 12px;
+  }
+  .inner-head:first-child { margin-top: 0; }
+
+  .punto-intro {
+    font-size: 13px; color: var(--lightgray); line-height: 1.75;
+    margin-bottom: 16px; padding-bottom: 14px;
+    border-bottom: 1px dashed var(--border);
+    font-style: italic;
+  }
+  .punto-intro strong { color: var(--lightgray); font-style: normal; }
+
+  .ref-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+  .ref-table th {
+    font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--gray);
+    padding: 6px 10px; background: rgba(0,0,0,0.4);
+    border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .ref-table td {
+    padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--lightgray); vertical-align: top;
+  }
+  .ref-table td:first-child {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    color: var(--gold); white-space: nowrap; letter-spacing: 0.05em;
+  }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .ref-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Tabla de alineamiento (3 cols iguales) */
+  .align-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+  .align-table td {
+    padding: 8px 12px; border: 1px solid var(--border);
+    color: var(--lightgray); text-align: center;
+    font-family: 'Rajdhani', sans-serif; font-weight: 600;
+    letter-spacing: 0.08em; font-size: 12px;
+  }
+  .align-table tr:first-child td { background: rgba(192,57,43,0.12); color: var(--green); }
+  .align-table tr:nth-child(2) td { background: rgba(0,0,0,0.3); color: var(--lightgray); }
+  .align-table tr:last-child td { background: rgba(192,57,43,0.08); color: #e06666; }
+
+  .badge {
+    font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; padding: 2px 8px; border-radius: 2px;
+    text-transform: uppercase; display: inline-block; vertical-align: middle;
+  }
+  .badge-red    { background: var(--red-dim); color: var(--white); border: 1px solid var(--red); }
+  .badge-gold   { background: var(--gold); color: #111; }
+  .badge-green  { background: #1e2a1e; color: var(--green); border: 1px solid #2d4a2d; }
+  .badge-blue   { background: #1e1e2a; color: #8899ff; border: 1px solid #2d2d4a; }
+  .badge-gray   { background: #222; color: var(--gray); border: 1px solid #333; }
+
+  .nota {
+    margin-top: 14px; padding: 8px 14px;
+    background: rgba(201,162,39,0.07);
+    border: 1px dashed rgba(201,162,39,0.25);
+    font-size: 12px; color: var(--gray);
+  }
+  .nota strong {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    letter-spacing: 0.1em; color: var(--gold); font-size: 11px;
+  }
+
+  .alerta {
+    margin-top: 14px; padding: 8px 14px;
+    background: rgba(192,57,43,0.08);
+    border: 1px dashed rgba(192,57,43,0.3);
+    font-size: 12px; color: var(--lightgray);
+  }
+  .alerta strong {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    letter-spacing: 0.1em; color: var(--red); font-size: 11px;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  @media(max-width: 540px){ .two-col { grid-template-columns: 1fr; } }
+  .two-col .regla { margin-bottom: 0; }
+
+  /* Level card */
+  .level-card {
+    display: grid; grid-template-columns: 80px 1fr;
+    border: 1px solid var(--border); border-left: 3px solid var(--red);
+    margin-bottom: 10px; background: rgba(0,0,0,0.28);
+  }
+  .level-card-num {
+    background: rgba(192,57,43,0.15);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 14px 8px; text-align: center;
+  }
+  .level-card-num .nvl {
+    font-family: 'Black Han Sans', sans-serif; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--red); text-transform: uppercase;
+  }
+  .level-card-num .num {
+    font-family: 'Black Han Sans', sans-serif; font-size: 28px;
+    color: var(--white); line-height: 1;
+  }
+  .level-card-num .name {
+    font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; color: var(--gray); text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .level-card-body { padding: 14px 16px; }
+  .level-section-label {
+    font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--red);
+    margin-bottom: 5px; margin-top: 10px;
+  }
+  .level-section-label:first-child { margin-top: 0; }
+  .level-card-body ul { margin: 0; padding-left: 16px; }
+  .level-card-body ul li { font-size: 12.5px; color: var(--lightgray); margin-bottom: 3px; line-height: 1.5; }
+  .level-card-body ul li strong { color: var(--white); }
+
+  /* Building card (básico → derivado) */
+  .building-card { margin-bottom: 10px; border: 1px solid var(--border); }
+  .building-row {
+    display: grid; grid-template-columns: 110px 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .building-row:last-child { border-bottom: none; }
+  .building-tag {
+    padding: 12px 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; border-right: 1px solid var(--border);
+  }
+  .building-row.basico .building-tag { background: rgba(192,57,43,0.15); }
+  .building-row.derivado .building-tag { background: rgba(192,57,43,0.07); }
+  .building-tag .b-tipo {
+    font-family: 'Rajdhani', sans-serif; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); margin-bottom: 4px;
+  }
+  .building-tag .b-name {
+    font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.05em; color: var(--white); line-height: 1.2;
+  }
+  .building-body { padding: 12px 14px; background: rgba(0,0,0,0.2); }
+  .building-row.derivado .building-body { background: rgba(0,0,0,0.12); }
+  .building-desc { font-size: 12.5px; color: var(--lightgray); line-height: 1.65; margin-bottom: 6px; }
+  .building-cost {
+    font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; color: var(--gold);
+  }
+  .building-notes { margin-top: 5px; font-size: 11.5px; color: var(--gray); font-style: italic; }
+
+  /* Prestige card */
+  .prestige-card {
+    display: grid; grid-template-columns: 110px 1fr;
+    border: 1px solid var(--border); border-left: 3px solid var(--gold);
+    margin-bottom: 10px; background: rgba(0,0,0,0.28);
+  }
+  .prestige-tag {
+    background: rgba(201,162,39,0.08);
+    border-right: 1px solid var(--border);
+    padding: 12px 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  }
+  .prestige-tag .p-name {
+    font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.05em; color: var(--gold); line-height: 1.2;
+  }
+  .prestige-tag .p-cost {
+    font-family: 'Black Han Sans', sans-serif; font-size: 16px; color: var(--white);
+    margin-top: 6px; letter-spacing: 0.05em;
+  }
+  .prestige-tag .p-unit {
+    font-family: 'Rajdhani', sans-serif; font-size: 9px; letter-spacing: 0.15em;
+    color: var(--gray); text-transform: uppercase;
+  }
+  .prestige-body { padding: 14px 16px; font-size: 12.5px; color: var(--lightgray); line-height: 1.65; }
+
+  /* Estructura card */
+  .struct-card {
+    display: grid; grid-template-columns: 110px 1fr;
+    border: 1px solid var(--border); border-left: 3px solid var(--red-dim);
+    margin-bottom: 8px; background: rgba(0,0,0,0.28);
+  }
+  .struct-tag {
+    background: rgba(192,57,43,0.1);
+    border-right: 1px solid var(--border);
+    padding: 12px 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  }
+  .struct-tag .s-name {
+    font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.05em; color: var(--white); line-height: 1.2;
+  }
+  .struct-tag .s-cost {
+    font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
+    color: var(--gold); margin-top: 5px; letter-spacing: 0.05em;
+  }
+  .struct-body { padding: 12px 14px; font-size: 12.5px; color: var(--lightgray); line-height: 1.65; }
+  .struct-body .s-notes { margin-top: 6px; font-size: 11.5px; color: var(--gray); font-style: italic; }
+
+  #search-fab {
+    position: fixed; left: 16px; top: 50%; transform: translateY(-50%);
+    z-index: 200; display: flex; flex-direction: column; align-items: flex-start; gap: 0;
+  }
+  #search-toggle {
+    width: 40px; height: 40px; background: var(--red); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    transition: background 0.18s; flex-shrink: 0;
+  }
+  #search-toggle:hover { background: #a93226; }
+  #search-toggle svg { width: 18px; height: 18px; }
+
+  #search-panel {
+    background: #141414; border: 1px solid var(--red-dim); border-left: 3px solid var(--red);
+    width: 240px; overflow: hidden; max-height: 0; opacity: 0;
+    transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease;
+    pointer-events: none;
+  }
+  #search-panel.open { max-height: 220px; opacity: 1; pointer-events: all; }
+  #search-panel-inner { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+  #search-label { font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); }
+  #search-input {
+    width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+    border-bottom-color: var(--red-dim); color: var(--white);
+    font-family: 'Inter', sans-serif; font-size: 13px; padding: 7px 10px;
+    outline: none; transition: border-color 0.18s;
+  }
+  #search-input:focus { border-color: var(--red); }
+  #search-input::placeholder { color: rgba(160,160,160,0.4); }
+  #search-status { font-family: 'Rajdhani', sans-serif; font-size: 11px; letter-spacing: 0.08em; color: var(--gray); min-height: 16px; }
+  #search-status .hit-count { color: var(--gold); font-weight: 700; }
+  #search-status .no-results { color: var(--red); }
+  #search-nav { display: flex; gap: 6px; align-items: center; }
+  .search-nav-btn {
+    background: rgba(192,57,43,0.15); border: 1px solid var(--red-dim); color: var(--white);
+    cursor: pointer; padding: 4px 10px; font-family: 'Rajdhani', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+    transition: background 0.15s; display: flex; align-items: center; gap: 4px;
+  }
+  .search-nav-btn:hover { background: rgba(192,57,43,0.35); }
+  .search-nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .search-nav-btn svg { width: 12px; height: 12px; }
+  #search-clear {
+    background: none; border: none; color: var(--gray); cursor: pointer;
+    font-family: 'Rajdhani', sans-serif; font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 0; margin-left: auto; transition: color 0.15s;
+  }
+  #search-clear:hover { color: var(--red); }
+  mark.search-hit { background: rgba(201,162,39,0.35); color: var(--white); border-radius: 1px; padding: 0 1px; }
+  mark.search-hit.current { background: var(--gold); color: #111; }
+
+  @media (max-width: 640px) {
+    #search-fab { left: 8px; top: auto; bottom: 20px; transform: none; flex-direction: column-reverse; }
+    #search-panel { width: calc(100vw - 32px); max-width: 300px; }
+  }
+
+  .page-footer {
+    text-align: center; padding: 32px 0 8px;
+    font-family: 'Rajdhani', sans-serif; font-size: 11px;
+    letter-spacing: 0.2em; color: rgba(255,255,255,0.15); text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- ══ MASTHEAD ══ -->
+  <div class="masthead">
+    <div class="masthead-inner">
+      <div>
+        <div class="masthead-logo">
+          Marvel Hobba RPG
+          <span>Reglamento de Sistemas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="masthead-image-zone">
+    <div class="img-placeholder">[ Imagen de cabecera — reemplazar con &lt;img src="..."&gt; ]</div>
+  </div>
+
+  <!-- ══ INTRO BAND ══ -->
+  <div class="intro-band">
+    <div class="intro-title">Sistema de Agrupaciones</div>
+    <div class="intro-desc">
+      Desde organizaciones encubiertas hasta célebres escuadrones de superhéroes, las facciones desempeñan un papel fundamental en la conformación del universo Marvel. Este documento recoge todo lo necesario para comprender las dinámicas de agrupación y las herramientas disponibles para quienes decidan seguir el camino solitario.
+    </div>
+  </div>
+
+  <!-- ══ 01 — AGRUPACIONES ══ -->
+  <div class="punto" id="p1">
+    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
+      <div class="punto-num">01</div>
+      <div class="punto-header-inner">
+        <div class="punto-title-wrap">
+          <div class="punto-label">Sección 1</div>
+          <div class="punto-title">Agrupaciones — Fundación & Reglas</div>
+        </div>
+        <div class="punto-tags">
+          <span class="badge badge-gold">Fundamental</span>
+          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </button>
+    <div class="punto-body">
+      <div class="punto-intro">Una agrupación es cualquier forma de organización colectiva dentro del universo Marvel. No importa su alineamiento ni su tamaño; lo que las define es que tienen presencia en el mapa, recursos compartidos y una progresión colectiva real.</div>
+
+      <div class="inner-head">1.1 Fundación — Requisitos</div>
+
+      <div class="struct-card">
+        <div class="struct-tag"><div class="s-name">Miembros</div></div>
+        <div class="struct-body">Mínimo <strong>4 miembros fundadores</strong>, máximo 8 al inicio.</div>
+      </div>
+      <div class="struct-card">
+        <div class="struct-tag"><div class="s-name">Jerarquía</div></div>
+        <div class="struct-body">Designar un <strong>Líder</strong> y un <strong>Segundo al Mando</strong>.</div>
+      </div>
+      <div class="struct-card">
+        <div class="struct-tag"><div class="s-name">Solicitud</div></div>
+        <div class="struct-body">Publicar solicitud oficial con: nombre, alineamiento, objetivos, miembros y sus fichas.</div>
+      </div>
+      <div class="struct-card">
+        <div class="struct-tag"><div class="s-name">Aprobación</div></div>
+        <div class="struct-body">Contar con la aprobación del equipo administrativo antes de operar.</div>
+      </div>
+      <div class="struct-card">
+        <div class="struct-tag"><div class="s-name">Sede obligatoria</div></div>
+        <div class="struct-body">Adquirir una <strong>Sede de Categoría I (500 CR)</strong> antes o simultáneamente a la aprobación. Sin sede, no hay agrupación.</div>
+      </div>
+
+      <div class="inner-head">Formulario de Solicitud</div>
+      <div class="regla dim">
+        <div class="regla-name white">Al postear la solicitud</div>
+        <div class="regla-text">
+          <strong>Nombre:</strong> Indicaremos el nombre de la Agrupación.<br>
+          <strong>Fecha de creación:</strong> El tiempo empieza a correr desde que se crea la solicitud.<br>
+          <strong>Alineamiento:</strong> Indicaremos su alineamiento.<br>
+          <strong>Objetivos:</strong> En forma de listado.<br>
+          <strong>Miembros:</strong> Con jerarquía y dirección a la ficha.<br>
+          <strong>Aprobación:</strong> Dejar vacío. Administración lo editará tras revisar.
+        </div>
+      </div>
+      <div class="regla dim">
+        <div class="regla-name white">Post general de la agrupación</div>
+        <div class="regla-text">
+          <strong>Nombre / Descripción / Miembros / Alineamiento / Objetivos / Territorio</strong> (si se posee)<br>
+          <strong>Arcas:</strong> La totalidad de créditos que posee la agrupación.<br>
+          <strong>Historial de Acciones:</strong> Toda acción realizada: compras, canjeo de PDP, donaciones, extracciones, etc.
+        </div>
+      </div>
+
+      <div class="inner-head">1.2 Reglas Generales</div>
+
+      <div class="two-col">
+        <div class="regla">
+          <div class="regla-name">Exclusividad</div>
+          <div class="regla-text">Un jugador solo puede pertenecer a una agrupación a la vez, salvo que posea alguna pasiva o rasgo.</div>
+        </div>
+        <div class="regla">
+          <div class="regla-name">Abandono</div>
+          <div class="regla-text">Sin cooldown al abandonar, pero se deben esperar <strong>48 horas</strong> para unirse a otra agrupación.</div>
+        </div>
+        <div class="regla green">
+          <div class="regla-name green">Nuevo miembro</div>
+          <div class="regla-text">Un miembro que se une obtiene los beneficios de la agrupación de forma directa.</div>
+        </div>
+        <div class="regla">
+          <div class="regla-name">Privacidad</div>
+          <div class="regla-text">Una agrupación es <strong>privada por defecto</strong>. Puede hacerse pública en cualquier momento.</div>
+        </div>
+      </div>
+      <div class="regla gold">
+        <div class="regla-name">Registro</div>
+        <div class="regla-text">La gestión de PDP y Créditos es responsabilidad del <em>Líder o Segundo al Mando</em>. Deben mantener un registro público y actualizado.</div>
+      </div>
+
+      <div class="inner-head">1.3 Alineamiento</div>
+      <p style="font-size:12.5px;color:var(--lightgray);margin-bottom:12px;">Cada agrupación debe elegir un alineamiento acorde a sus ideales y métodos. Al finalizar una temporada es posible solicitar un cambio mediante ticket-narración con justificación sólida.</p>
+      <table class="align-table">
+        <tr><td>Legal Bueno</td><td>Neutral Bueno</td><td>Caótico Bueno</td></tr>
+        <tr><td>Legal Neutral</td><td>Neutral</td><td>Caótico Neutral</td></tr>
+        <tr><td>Legal Malvado</td><td>Neutral Maligno</td><td>Caótico Maligno</td></tr>
+      </table>
+      <div class="nota"><strong>Nota 1.2</strong> — Un jugador puede pertenecer a una agrupación que no sea acorde al alineamiento de su personaje.</div>
+    </div>
+  </div>
+
+  <!-- ══ 02 — RECURSOS ══ -->
+  <div class="punto" id="p2">
+    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
+      <div class="punto-num">02</div>
+      <div class="punto-header-inner">
+        <div class="punto-title-wrap">
+          <div class="punto-label">Sección 2</div>
+          <div class="punto-title">Recursos — Los Dos Pilares</div>
+        </div>
+        <div class="punto-tags">
+          <span class="badge badge-red">Core</span>
+          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </button>
+    <div class="punto-body">
+      <div class="punto-intro">Toda agrupación maneja dos recursos que no son intercambiables. Ambos fluyen en paralelo: una agrupación puede tener mucho prestigio pero poca infraestructura, o una sede enorme con poca influencia narrativa.</div>
+
+      <table class="ref-table">
+        <thead><tr><th>Recurso</th><th>¿Qué representa?</th><th>¿Cómo se obtiene?</th></tr></thead>
+        <tbody>
+          <tr><td>Créditos (CR)</td><td>Capital económico. Sirve para construir, mejorar y mantener la sede.</td><td>Misiones, eventos, bonificaciones de mejoras activas.</td></tr>
+          <tr><td>Puntos de Prestigio (PDP)</td><td>Reputación e influencia de la agrupación. Sirve para subir de nivel y desbloquear mejoras.</td><td>Operativos grupales, contra-operativos, actividad narrativa.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="nota"><strong>2.1</strong> — Los CR y los PDP nunca se intercambian entre sí. Mientras los Créditos pueden sustraerse de las arcas en cualquier momento, los PDP no.</div>
+      <div class="nota" style="margin-top:8px;"><strong>2.2</strong> — Un jugador puede donar créditos a su agrupación posteándose en el post de heridas-acciones-intercambios.</div>
+      <div class="nota" style="margin-top:8px;"><strong>2.3</strong> — Para obtener PDP de un contra-operativo no es necesario ganarlo.</div>
+    </div>
+  </div>
+
+  <!-- ══ 03 — SEDES ══ -->
+  <div class="punto" id="p3">
+    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
+      <div class="punto-num">03</div>
+      <div class="punto-header-inner">
+        <div class="punto-title-wrap">
+          <div class="punto-label">Sección 3</div>
+          <div class="punto-title">Las Sedes — El Corazón del Sistema</div>
+        </div>
+        <div class="punto-tags">
+          <span class="badge badge-gold">Infraestructura</span>
+          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </button>
+    <div class="punto-body">
+      <div class="punto-intro">Toda agrupación debe tener una sede activa. La interpretación de cómo es (interiores, salas linkeadas, etc.) queda a manos de cada uno, pero se debe mantener coherencia con la categoría poseída. <strong>No es necesario poseer un territorio para Sede Cat. I y II</strong>; a partir de Cat. III sí es obligatorio, salvo que se opte por el Helicarrier.</div>
+
+      <div class="inner-head">3.1 Categorías de Sede</div>
+
+      <table class="ref-table">
+        <thead><tr><th>Cat.</th><th>Nombre</th><th>Costo</th><th>Espacios</th><th>Nivel Req.</th></tr></thead>
+        <tbody>
+          <tr><td>I</td><td>Refugio</td><td>500 CR</td><td>2 espacios</td><td>Nivel 1</td></tr>
+          <tr><td>II</td><td>Instalación</td><td>1.200 CR</td><td>4 espacios</td><td>Nivel 2</td></tr>
+          <tr><td>III</td><td>Complejo</td><td>2.500 CR</td><td>6 espacios</td><td>Nivel 3</td></tr>
+          <tr><td>IV</td><td>Bastión</td><td>4.500 CR</td><td>8 espacios</td><td>Nivel 5</td></tr>
+          <tr><td>V</td><td>Fortaleza</td><td>8.000 CR</td><td>12 espacios</td><td>Nivel 7</td></tr>
+        </tbody>
+      </table>
+
+      <div class="nota"><strong>3.2</strong> — No es obligatorio poseer una sede para crear una agrupación, pero sí para acceder a mejoras de infraestructura.</div>
+      <div class="nota" style="margin-top:8px;"><strong>3.3</strong> — Existen documentos que otorgan una sede especial. Es posible compartirla con el resto de miembros, aunque a veces pueden existir requisitos.</div>
+
+      <div class="inner-head">3.2 Mudanzas</div>
+
+      <div class="regla green">
+        <div class="regla-name green">Se traslada</div>
+        <div class="regla-text">Las mejoras estructurales físicas (laboratorios, arsenales, zonas de entrenamiento) se trasladan sin costo adicional.</div>
+      </div>
+      <div class="regla">
+        <div class="regla-name red">No se traslada</div>
+        <div class="regla-text">Las mejoras ligadas al territorio (control de zona, puntos de influencia) NO se trasladan. Si la sede cambia de barrio, ese dominio queda atrás y debe reconquistarse.</div>
+      </div>
+      <div class="regla gold">
+        <div class="regla-name">Cooldown</div>
+        <div class="regla-text">El traslado debe registrarse en el post de la agrupación. Cooldown de <em>30 días</em> antes de poder mudarse de nuevo.</div>
+      </div>
+
+      <div class="inner-head">3.3 Helicarrier — Sede Apátrida</div>
+      <p style="font-size:12.5px;color:var(--lightgray);line-height:1.7;margin-bottom:12px;">
+        Alternativa a la sede fija para agrupaciones que prefieren la movilidad. En lugar de requerir territorio a partir de Cat. III, pueden invertir en un <strong>Helicarrier</strong> como base de operaciones móvil. Ideal para células sin base fija, equipos mercenarios o facciones que priorizan la libertad de movimiento sobre el control de zona.
+      </p>
+
+      <div class="two-col">
+        <div class="regla gold">
+          <div class="regla-name">Costo</div>
+          <div class="regla-text"><em>6.000 CR</em> — Requiere Nivel 3.</div>
+        </div>
+        <div class="regla gold">
+          <div class="regla-name">Equivalencia</div>
+          <div class="regla-text">Funciona como <em>Sede Cat. III</em> con todos sus espacios. No puede escalar a categorías superiores mientras sea apátrida.</div>
+        </div>
+      </div>
+
+      <div class="regla green">
+        <div class="regla-name green">Ventajas</div>
+        <div class="regla-text">
+          <ul>
+            <li>No requiere territorio activo para operar ni mantenerse.</li>
+            <li>Sin ubicación fija: no puede ser atacada mediante asedios territoriales.</li>
+            <li>Permite construir estructuras internas normalmente.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="regla">
+        <div class="regla-name red">Restricciones</div>
+        <div class="regla-text">
+          <ul>
+            <li>No puede construir Edificios de Territorio ni beneficiarse de bonos de zona.</li>
+            <li>No puede reclamar, mantener ni fortif icar territorios en el mapa.</li>
+            <li>Si decide asentarse, debe adquirir territorio y sede fija. El Helicarrier se vende al <strong>50%</strong> de su valor.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 04 — ESTRUCTURAS ══ -->
+  <div class="punto" id="p4">
+    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
+      <div class="punto-num">04</div>
+      <div class="punto-header-inner">
+        <div class="punto-title-wrap">
+          <div class="punto-label">Sección 4</div>
+          <div class="punto-title">Estructuras — Qué se Puede Construir</div>
+        </div>
+        <div class="punto-tags">
+          <span class="badge badge-red">Mejoras</span>
+          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </button>
+    <div class="punto-body">
+      <div class="punto-intro">Los espacios de construcción de la sede se llenan con estructuras adquiridas con Créditos. Cada estructura ocupa 1 espacio salvo indicación contraria. Las estructuras de nivel superior sustituyen a las anteriores sin ocupar espacio adicional.</div>
+
+      <div class="inner-head">Nivel I — Desde Sede Cat. I</div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Sala de Operaciones</div><div class="s-cost">300 CR</div></div><div class="struct-body">Permite planificar misiones grupales con ventajas coordinadas. Los miembros obtienen <strong>+5% de Créditos</strong> en misiones completadas como grupo.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Zona de Entrenamiento</div><div class="s-cost">350 CR</div></div><div class="struct-body">Una vez por semana permite un combate de práctica sin consecuencias. Otorga <strong>1 requisito de combate</strong> a cada participante.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Enfermería Básica</div><div class="s-cost">400 CR</div></div><div class="struct-body">Reduce un <strong>20%</strong> el tiempo de recuperación de heridas y estados post-combate. Uso: 1 vez por semana por miembro.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Almacén</div><div class="s-cost">250 CR</div></div><div class="struct-body">Permite guardar hasta <strong>5 objetos</strong> de inventario colectivo, accesibles por cualquier miembro activo.</div></div>
+
+      <div class="inner-head">Nivel II — Desde Sede Cat. II</div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Centro de Inteligencia</div><div class="s-cost">700 CR</div></div><div class="struct-body">Permite solicitar a Narración una escena de reconocimiento sobre un objetivo o zona. <strong>1 uso cada 2 semanas.</strong></div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Armería</div><div class="s-cost">800 CR</div></div><div class="struct-body">Reduce un <strong>15%</strong> el costo en CR de adquisición de equipamiento en tiendas para todos los miembros.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Laboratorio</div><div class="s-cost">900 CR</div></div><div class="struct-body">Requisito para que perfiles intelecto lleven a cabo legalizaciones de inventos dentro de la agrupación.<div class="s-notes">⭙ Necesario para perfiles científicos y tecnológicos.<br>⭙ Es posible otorgar permiso a alguien externo para que lo emplee.</div></div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Cuartel</div><div class="s-cost">600 CR</div></div><div class="struct-body">Aumenta el límite máximo de miembros en <strong>+3</strong>. Compras ilimitadas y <em>no ocupa Espacio de Construcción</em>.</div></div>
+
+      <div class="inner-head">Nivel III — Desde Sede Cat. III</div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Torre de Comunicaciones</div><div class="s-cost">1.400 CR</div></div><div class="struct-body">Permite coordinar operativos entre agrupaciones aliadas.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Bunker Reforzado</div><div class="s-cost">1.600 CR</div></div><div class="struct-body">En caso de declaración de Guerra al territorio de la Sede se obtiene un <strong>+10% [x1.10]</strong> de daño que supera límite.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Clínica Avanzada</div><div class="s-cost">1.200 CR</div></div><div class="struct-body">Amplía la Enfermería Básica: reduce recuperación de Vigor un <strong>25% [x0.75]</strong> y permite tratar heridas graves. <em>Sustituye a la Enfermería Básica.</em></div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Archivo Clasificado</div><div class="s-cost">1.000 CR</div></div><div class="struct-body">Permite almacenar información narrativa con valor on-rol (documentos, planos, secretos). Narración puede tenerlo en cuenta en eventos.</div></div>
+
+      <div class="inner-head">Nivel IV — Desde Sede Cat. IV</div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Centro de Mando</div><div class="s-cost">2.500 CR</div></div><div class="struct-body">Todos los operativos lanzados desde la sede otorgan <strong>+10% de PDP</strong> adicionales.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Laboratorio de Alto Nivel</div><div class="s-cost">2.800 CR</div></div><div class="struct-body">Versión extendida del Laboratorio. Permite legalizaciones de tecnología clasificada y prototipos experimentales. <em>Sustituye al anterior.</em></div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Hangar / Muelle Privado</div><div class="s-cost">3.000 CR</div></div><div class="struct-body">Otorga a la agrupación acceso a transporte propio.</div></div>
+
+      <div class="inner-head">Nivel V — Desde Sede Cat. V</div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Sala de Guerra</div><div class="s-cost">5.000 CR</div></div><div class="struct-body">Permite conquistar un <strong>segundo territorio</strong>.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Instalación Clasificada</div><div class="s-cost">6.000 CR</div></div><div class="struct-body">Desbloquea acceso al <strong>Mercado Negro</strong> de forma permanente para todos los miembros.</div></div>
+      <div class="struct-card"><div class="struct-tag"><div class="s-name">Santuario</div><div class="s-cost">4.500 CR</div></div><div class="struct-body">Proporciona inmunidad al territorio de la agrupación: no podrá ser atacada durante <strong>7 días</strong> tras activarse. Cooldown: 60 días.</div></div>
+    </div>
+  </div>
+
+  <!-- ══ 05 — NIVELES ══ -->
+  <div class="punto" id="p5">
+    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
+      <div class="punto-num">05</div>
+      <div class="punto-header-inner">
+        <div class="punto-title-wrap">
+          <div class="punto-label">Sección 5</div>
+          <div class="punto-title">Niveles de Agrupación — Progresión</div>
+        </div>
+        <div class="punto-tags">
+          <span class="badge badge-green">Progresión</span>
+          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </button>
+    <div class="punto-body">
+      <div class="punto-intro">La progresión no es lineal ni automática. Requiere tiempo real, actividad demostrable y Prestigio acumulado. Una agrupación activa tardará entre 6 y 10 meses en alcanzar los niveles máximos, sin sentir que se queda atascada.</div>
+
+      <div class="level-card">
+        <div class="level-card-num"><div class="nvl">NVL</div><div class="num">1</div><div class="name">Célula</div></div>
+        <div class="level-card-body">
+          <div class="level-section-label">Efecto</div>
+          <ul><li>Acceso a Estructuras de Nivel I.</li><li>Máximo 50 PDP acumulables.</li></ul>
+          <div class="level-section-label">Requisitos</div>
+          <ul><li>Fundar la agrupación.</li><li>Mínimo 5 miembros.</li><li>Sede Categoría I activa.</li></ul>
+        </div>
+      </div>
+
+      <div class="level-card">
+        <div class="level-card-num"><div class="nvl">NVL</div><div class="num">2</div><div class="name">Facción</div></div>
+        <div class="level-card-body">
+          <div class="level-section-label">Efecto</div>
+          <ul><li>Acceso a Estructuras de Nivel II.</li><li>Sistema de Alianzas disponible.</li><li>Máximo 160 PDP acumulables.</li></ul>
+          <div class="level-section-label">Requisitos</div>
+          <ul><li>1 mes como agrupación.</li><li>3 operativos completados.</li><li>Obtener 160 PDP.</li></ul>
+        </div>
+      </div>
+
+      <div class="level-card">
+        <div class="level-card-num"><div class="nvl">NVL</div><div class="num">3</div><div class="name">Organización</div></div>
+        <div class="level-card-body">
+          <div class="level-section-label">Efecto</div>
+          <ul><li>Acceso a Estructuras de Nivel III.</li><li>Sistema de Territorios y Conquistas.</li><li>Sistema de Guerras y Conflictos.</li><li>Reconocimiento oficial — abrir ticket-moderación para recibir el documento de sede.</li><li>Máximo 320 PDP acumulables.</li></ul>
+          <div class="level-section-label">Requisitos</div>
+          <ul><li>2 meses como agrupación.</li><li>5 operativos completados.</li><li>Obtener 320 PDP.</li></ul>
+        </div>
+      </div>
+
+      <div class="level-card">
+        <div class="level-card-num"><div class="nvl">NVL</div><div class="num">4</div><div class="name">Fuerza Establecida</div></div>
+        <div class="level-card-body">
+          <div class="level-section-label">Efecto</div>
+          <ul><li>Acceso a Estructuras de Nivel IV.</li><li>+1 Espacio de Construcción adicional permanente.</li><li>Máximo 480 PDP acumulables.</li></ul>
+          <div class="level-section-label">Requisitos</div>
+          <ul><li>3 meses como agrupación.</li><li>8 operativos completados.</li><li>Obtener 480 PDP.</li></ul>
+        </div>
+      </div>
+
+      <div class="level-card">
+        <div class="level-card-num"><div class="nvl">NVL</div><div class="num">5</div><div class="name">Potencia Regional</div></div>
+        <div class="level-card-body">
+          <div class="level-section-label">Efecto</div>
+          <ul><li>Acceso a Estructuras de Nivel V.</li><li>Acceso a Sede Categoría IV.</li><li>Evento único (gestionar con Narración).</li><li>Máximo 640 PDP acumulables.</li></ul>
+          <div class="level-section-label">Requisitos</div>
+          <ul><li>4 meses como agrupación.</li><li>10 operativos completados.</li><li>Obtener 640 PDP.</li></ul>
+        </div>
+      </div>
+
+      <div class="level-card">
+        <div class="level-card-num"><div class="nvl">NVL</div><div class="num">6</div><div class="name">Autoridad</div></div>
+        <div class="level-card-body">
+          <div class="level-section-label">Efecto</div>
+          <ul><li>Habilidad Faccional desbloqueada.</li><li>+1 Espacio de Construcción adicional permanente.</li><li>Máximo 800 PDP acumulables.</li></ul>
+          <div class="level-section-label">Requisitos</div>
+          <ul><li>5 meses como agrupación.</li><li>12 operativos completados.</li><li>Obtener 800 PDP.</li><li><strong>Aprobación administrativa.</strong></li></ul>
+        </div>
+      </div>
+
+      <div class="level-card">
+        <div class="level-card-num"><div class="nvl">NVL</div><div class="num">7</div><div class="name">Imperio</div></div>
+        <div class="level-card-body">
+          <div class="level-section-label">Efecto</div>
+          <ul><li>Acceso a Sede Categoría V.</li><li>Posibilidad de crear una División Subsidiaria.</li><li>Máximo 960 PDP acumulables.</li></ul>
+          <div class="level-section-label">Requisitos</div>
+          <ul><li>6 meses como agrupación.</li><li>15 operativos completados.</li><li>Obtener 960 PDP.</li><li><strong>Aprobación administrativa.</strong></li></ul>
+        </div>
+      </div>
+
+      <div class="level-card">
+        <div class="level-card-num"><div class="nvl">NVL</div><div class="num">8</div><div class="name">Leyenda</div></div>
+        <div class="level-card-body">
+          <div class="level-section-label">Efecto</div>
+          <ul><li>Evento único de alto impacto (gestionar con Narración).</li><li>Impacto narrativo permanente en el mundo del rol.</li><li>Sin techo de PDP.</li></ul>
+          <div class="level-section-label">Requisitos</div>
+          <ul><li>10 meses como agrupación.</li><li>25 operativos completados.</li><li>Obtener 1.600 PDP.</li><li><strong>Aprobación administrativa.</strong></li></ul>
+        </div>
+      </div>
+
+      <div class="nota" style="margin-top:14px;"><strong>División Subsidiaria (Nivel 7)</strong> — Rama secundaria de 3 a 5 miembros que opera semi-independientemente bajo el paraguas de la agrupación principal. Tiene su propia sala en Habbo pero comparte recursos de la sede central. Solo una división activa a la vez, manejada por un usuario registrado.</div>
+    </div>
+  </div>
+
+  <!-- ══ 06 — OBTENCIÓN DE PDP ══ -->
+  <div class="punto" id="p6">
+    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
+      <div class="punto-num">06</div>
+      <div class="punto-header-inner">
+        <div class="punto-title-wrap">
+          <div class="punto-label">Sección 6</div>
+          <div class="punto-title">Obtención de Prestigio — Fuentes de PDP</div>
+        </div>
+        <div class="punto-tags">
+          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </button>
+    <div class="punto-body">
+      <table class="ref-table">
+        <thead><tr><th>Actividad</th><th>PDP Obtenidos</th></tr></thead>
+        <tbody>
+          <tr><td>Operativo grupal (mín. 3 miembros)</td><td>+4 PDP por participante (máx. 20 PDP)</td></tr>
+          <tr><td>Contra-operativo (mín. 2 miembros)</td><td>+8 PDP por participante (máx. 30 PDP)</td></tr>
+          <tr><td>Operativo conjunto con agrupación aliada</td><td>x2 de PDP respecto a un operativo grupal común para ambas agrupaciones</td></tr>
+          <tr><td>Evento</td><td>Criterio del narrador</td></tr>
+        </tbody>
+      </table>
+      <div class="nota"><strong>6.1</strong> — No existe límite semanal de acumulación, pero sí un techo total por nivel. Una vez alcanzado el máximo acumulable del nivel actual, los PDP dejan de sumar hasta que se gaste o se suba de nivel.</div>
+    </div>
+  </div>
+
+  <!-- ══ 07 — MEJORAS PDP ══ -->
+  <div class="punto" id="p7">
+    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
+      <div class="punto-num">07</div>
+      <div class="punto-header-inner">
+        <div class="punto-title-wrap">
+          <div class="punto-label">Sección 7</div>
+          <div class="punto-title">Mejoras de Prestigio — Desbloqueos Sistémicos</div>
+        </div>
+        <div class="punto-tags">
+          <span class="badge badge-gold">Prestigio</span>
+          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </button>
+    <div class="punto-body">
+      <div class="punto-intro">El Prestigio no solo mide la madurez de una agrupación: también se puede gastar para desbloquear acceso a mecánicas del sistema. Estas mejoras son permanentes una vez adquiridas y no se pierden aunque el saldo de PDP baje.</div>
+
+      <div class="prestige-card">
+        <div class="prestige-tag"><div class="p-name">Gran Alianza</div><div class="p-cost">250</div><div class="p-unit">PDP</div></div>
+        <div class="prestige-body">Permite compartir bonus de estructuras y de territorios conquistados con otra agrupación aliada.</div>
+      </div>
+      <div class="prestige-card">
+        <div class="prestige-tag"><div class="p-name">Información Clasificada</div><div class="p-cost">250</div><div class="p-unit">PDP</div></div>
+        <div class="prestige-body">Desbloquea acceso al <strong>Mercado Negro</strong> de forma permanente para todos los miembros de la agrupación.</div>
+      </div>
+      <div class="prestige-card">
+        <div class="prestige-tag"><div class="p-name">Somos Noticia</div><div class="p-cost">250</div><div class="p-unit">PDP</div></div>
+        <div class="prestige-body">Permite solicitar un evento privado a Narración con recompensas y consecuencias a escala. Requiere aprobación. Máximo canjeable <strong>una vez por mes</strong>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 08 — EDIFICIOS DE TERRITORIO ══ -->
+  <div class="punto" id="p8">
+    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
+      <div class="punto-num">08</div>
+      <div class="punto-header-inner">
+        <div class="punto-title-wrap">
+          <div class="punto-label">Sección 8</div>
+          <div class="punto-title">Edificios de Territorio — Construcción & Dominio</div>
+        </div>
+        <div class="punto-tags">
+          <span class="badge badge-red">Nivel 3+</span>
+          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </button>
+    <div class="punto-body">
+      <div class="punto-intro">A partir de Nivel 3, las agrupaciones pueden construir edificios en los territorios que controlan. Son construcciones permanentes ligadas al territorio, no a la sede. Si el territorio es conquistado, los edificios pasan a manos del nuevo dueño.</div>
+
+      <div class="alerta"><strong>Sistema básico → derivado</strong> — Cada territorio tiene <strong>2 huecos de construcción</strong> por defecto. El edificio derivado sustituye al básico ocupando el mismo hueco, no uno adicional.</div>
+
+      <div class="inner-head" style="margin-top:18px;">Clínica de Campo → Centro Médico</div>
+      <div class="building-card">
+        <div class="building-row basico">
+          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Clínica de Campo</div></div>
+          <div class="building-body"><div class="building-desc">Instalación médica de emergencia en el territorio. Reduce un <strong>20%</strong> el tiempo de recuperación de heridas para miembros que operen en esa zona.</div><div class="building-cost">800 CR</div></div>
+        </div>
+        <div class="building-row derivado">
+          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Centro Médico</div></div>
+          <div class="building-body"><div class="building-desc">Ampliación completa. Reduce un <strong>40%</strong> el tiempo de recuperación y permite tratar heridas graves sin acudir a la sede.</div><div class="building-cost">+1.400 CR adicionales</div></div>
+        </div>
+      </div>
+
+      <div class="inner-head">Almacén Logístico → Centro de Distribución</div>
+      <div class="building-card">
+        <div class="building-row basico">
+          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Almacén Logístico</div></div>
+          <div class="building-body"><div class="building-desc">Genera <strong>200 CR pasivos</strong> al inicio de cada temporada por cada territorio en el que esté construido.</div><div class="building-cost">700 CR</div></div>
+        </div>
+        <div class="building-row derivado">
+          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Centro de Distribución</div></div>
+          <div class="building-body"><div class="building-desc">Genera <strong>500 CR pasivos</strong> al inicio de temporada y reduce un <strong>10%</strong> el costo de todas las compras de estructuras de sede.</div><div class="building-cost">+1.200 CR adicionales</div></div>
+        </div>
+      </div>
+
+      <div class="inner-head">Taller → Forja Avanzada</div>
+      <div class="building-card">
+        <div class="building-row basico">
+          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Taller</div></div>
+          <div class="building-body"><div class="building-desc">Permite llevar a cabo legalizaciones de objetos y equipamiento sin necesidad de acudir al Laboratorio de la sede.</div><div class="building-cost">900 CR</div></div>
+        </div>
+        <div class="building-row derivado">
+          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Forja Avanzada</div></div>
+          <div class="building-body"><div class="building-desc">Equivalente al Laboratorio de Alto Nivel. Permite craftear equipamiento colectivo directamente en el territorio.</div><div class="building-cost">+1.800 CR adicionales</div></div>
+        </div>
+      </div>
+
+      <div class="inner-head">Puesto de Vigilancia → Torre de Control</div>
+      <div class="building-card">
+        <div class="building-row basico">
+          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Puesto de Vigilancia</div></div>
+          <div class="building-body"><div class="building-desc">La agrupación recibe aviso narrativo anticipado cuando otra agrupación inicia acciones de reconocimiento o espionaje sobre ese territorio.</div><div class="building-cost">600 CR</div></div>
+        </div>
+        <div class="building-row derivado">
+          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Torre de Control</div></div>
+          <div class="building-body"><div class="building-desc">Además del aviso anticipado, los defensores obtienen <strong>+2 al dado</strong> en la primera ronda de un ataque al territorio y el atacante no puede beneficiarse de sorpresa táctica.</div><div class="building-cost">+1.200 CR adicionales</div></div>
+        </div>
+      </div>
+
+      <div class="inner-head">Centro Comunitario → Sede Gubernamental</div>
+      <div class="building-card">
+        <div class="building-row basico">
+          <div class="building-tag"><div class="b-tipo">Básico</div><div class="b-name">Centro Comunitario</div></div>
+          <div class="building-body"><div class="building-desc">Aumenta la Influencia generada sobre el territorio en un <strong>15%</strong> y permite establecer una ley sencilla sobre el distrito.</div><div class="building-cost">1.000 CR</div><div class="building-notes">⭙ Solo disponible para alineamiento Legal.</div></div>
+        </div>
+        <div class="building-row derivado">
+          <div class="building-tag"><div class="b-tipo">Derivado</div><div class="b-name">Sede Gubernamental</div></div>
+          <div class="building-body"><div class="building-desc">Control institucional total: impuestos, veto de acceso, treguas formalizadas. Genera <strong>300 CR pasivos</strong> al inicio de temporada con la ley de impuestos activa.</div><div class="building-cost">+2.000 CR adicionales</div><div class="building-notes">⭙ Requiere haber dominado el territorio durante al menos 2 meses consecutivos.</div></div>
+        </div>
+      </div>
+
+      <div class="inner-head">Red de Contactos</div>
+      <div class="struct-card" style="border-left-color:var(--red);">
+        <div class="struct-tag"><div class="s-name">Red de Contactos</div><div class="s-cost">1.100 CR</div></div>
+        <div class="struct-body">
+          Infraestructura de información y tráfico paralelo. Permite generar <strong>rumores vendibles</strong> sobre otros jugadores o agrupaciones: movimientos, identidades, planes. Pueden venderse por CR o usarse como ventaja narrativa. <em>1 rumor por territorio por semana, gestionado con Narración.</em>
+          <div class="s-notes">⭙ Solo disponible para alineamiento Neutral o Maligno.<br>⭙ Requiere haber desbloqueado Información Clasificada (mejora de PDP).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 09 — JUGADORES SOLITARIOS ══ -->
+  <div class="punto" id="p9">
+    <button class="punto-trigger" onclick="togglePunto(this)" aria-expanded="false">
+      <div class="punto-num">09</div>
+      <div class="punto-header-inner">
+        <div class="punto-title-wrap">
+          <div class="punto-label">Sección 9</div>
+          <div class="punto-title">Jugadores Solitarios — El Camino Individual</div>
+        </div>
+        <div class="punto-tags">
+          <span class="badge badge-gray">Solitario</span>
+          <svg class="punto-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </button>
+    <div class="punto-body">
+      <div class="punto-intro">No todo el mundo quiere organización. Los solitarios tienen su propio camino de progresión: más lento, más personal, pero igual de válido narrativamente.</div>
+
+      <div class="inner-head">Piso Franco</div>
+      <p style="font-size:12.5px;color:var(--lightgray);line-height:1.7;margin-bottom:12px;">Al igual que las agrupaciones tienen sede, los solitarios pueden adquirir un <strong>Piso Franco</strong>: un espacio personal en el mapa con hasta 3 Espacios de Construcción.</p>
+
+      <div class="two-col">
+        <div class="regla gold">
+          <div class="regla-name">Costo</div>
+          <div class="regla-text"><em>300 Créditos.</em></div>
+        </div>
+        <div class="regla gold">
+          <div class="regla-name">Espacios</div>
+          <div class="regla-text">Máximo <em>3 Espacios de Construcción</em> activos.</div>
+        </div>
+      </div>
+      <div class="regla">
+        <div class="regla-name">Estructuras disponibles</div>
+        <div class="regla-text">Solo pueden instalar estructuras de <strong>Nivel I y II</strong>. Para acceder a Nivel III o superior deben usar instalaciones de agrupaciones aliadas (con acuerdo narrativo).</div>
+      </div>
+      <div class="regla dim">
+        <div class="regla-name white">Límite</div>
+        <div class="regla-text">Un jugador solitario no puede poseer más de un Piso Franco simultáneamente.</div>
+      </div>
+
+      <div class="inner-head">Prestigio Personal (PP)</div>
+      <p style="font-size:12.5px;color:var(--lightgray);line-height:1.7;margin-bottom:12px;">Los solitarios acumulan Prestigio Personal (PP), análogo a los PDP pero a escala individual. No sirve para subir niveles de agrupación, sino para progresar en el plano personal.</p>
+
+      <table class="ref-table">
+        <thead><tr><th>Actividad</th><th>PP Obtenidos</th></tr></thead>
+        <tbody>
+          <tr><td>Misión completada en solitario</td><td>+5 PP</td></tr>
+          <tr><td>Participación en evento</td><td>+8 PP</td></tr>
+          <tr><td>Trama personal con impacto narrativo</td><td>+10 a +30 PP (criterio de Narración)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="inner-head">¿Para qué sirve el PP?</div>
+      <div class="regla"><div class="regla-name">Mejoras del Piso Franco</div><div class="regla-text">Desbloquear estructuras y mejoras para el espacio personal.</div></div>
+      <div class="regla"><div class="regla-name">Estructuras exclusivas</div><div class="regla-text">Acceso a estructuras estéticas o especiales no disponibles en tiendas ordinarias.</div></div>
+      <div class="regla gold"><div class="regla-name">Acceso a Facciones Oficiales</div><div class="regla-text">En ciertos casos, como requisito previo para ser considerado por facciones de alto nivel.</div></div>
+
+      <div class="nota"><strong>Nota</strong> — Los solitarios nunca quedan bloqueados narrativamente: pueden participar en operativos de agrupaciones como <em>contratistas externos</em>, recibiendo Créditos por su trabajo pero sin generar PDP de agrupación.</div>
+    </div>
+  </div>
+
+  <div class="page-footer">Marvel Hobba RPG — Sistema de Agrupaciones · Reglamento General</div>
+
+</div>
+
+<!-- ══ BUSCADOR FLOTANTE ══ -->
+<div id="search-fab">
+  <button id="search-toggle" title="Buscar en el reglamento" onclick="toggleSearch()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+  </button>
+  <div id="search-panel">
+    <div id="search-panel-inner">
+      <div id="search-label">Buscar en el reglamento</div>
+      <input id="search-input" type="text" placeholder="Ej: Sede, Prestigio, Nivel…" autocomplete="off" oninput="doSearch(this.value)" onkeydown="searchKeyNav(event)">
+      <div id="search-status"></div>
+      <div id="search-nav">
+        <button class="search-nav-btn" id="btn-prev" onclick="navHit(-1)" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Ant.
+        </button>
+        <button class="search-nav-btn" id="btn-next" onclick="navHit(1)" disabled>
+          Sig.<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button id="search-clear" onclick="clearSearch()">Limpiar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tip-popup"></div>
+
+<script>
+  function togglePunto(btn) {
+    const punto = btn.closest('.punto');
+    const isOpen = punto.hasAttribute('open');
+    if (isOpen) { punto.removeAttribute('open'); btn.setAttribute('aria-expanded','false'); }
+    else { punto.setAttribute('open',''); btn.setAttribute('aria-expanded','true'); }
+  }
+
+  let searchOpen=false, allHits=[], currentHit=-1;
+  function toggleSearch(){
+    searchOpen=!searchOpen;
+    document.getElementById('search-panel').classList.toggle('open',searchOpen);
+    if(searchOpen) setTimeout(()=>document.getElementById('search-input').focus(),80);
+  }
+  function doSearch(query){
+    clearMarks(); allHits=[]; currentHit=-1;
+    const status=document.getElementById('search-status');
+    const btnPrev=document.getElementById('btn-prev');
+    const btnNext=document.getElementById('btn-next');
+    if(!query||query.trim().length<2){status.innerHTML='';btnPrev.disabled=true;btnNext.disabled=true;return;}
+    const term=query.trim();
+    const regex=new RegExp(escapeRegex(term),'gi');
+    document.querySelectorAll('.punto').forEach(punto=>{
+      const body=punto.querySelector('.punto-body');
+      const header=punto.querySelector('.punto-header-inner');
+      if(!body||!header) return;
+      const titleEl=header.querySelector('.punto-title');
+      if(titleEl&&regex.test(titleEl.textContent)){regex.lastIndex=0;highlightNode(titleEl,regex);regex.lastIndex=0;}
+      const textNodes=getTextNodes(body);
+      textNodes.forEach(node=>{
+        regex.lastIndex=0;
+        if(regex.test(node.nodeValue)){
+          regex.lastIndex=0;
+          const marked=markTextNode(node,regex);
+          if(marked.length){if(!punto.hasAttribute('open')){punto.setAttribute('open','');punto.querySelector('.punto-trigger').setAttribute('aria-expanded','true');}}
+        }
+      });
+    });
+    allHits=Array.from(document.querySelectorAll('mark.search-hit'));
+    if(allHits.length===0){status.innerHTML=`<span class="no-results">Sin resultados para "${escapeHtml(term)}"</span>`;btnPrev.disabled=true;btnNext.disabled=true;}
+    else{currentHit=0;highlightCurrent();status.innerHTML=`<span class="hit-count">${allHits.length}</span> resultado${allHits.length!==1?'s':''}`;btnPrev.disabled=allHits.length<=1;btnNext.disabled=allHits.length<=1;}
+  }
+  function navHit(dir){if(allHits.length===0)return;allHits[currentHit]?.classList.remove('current');currentHit=(currentHit+dir+allHits.length)%allHits.length;highlightCurrent();const total=allHits.length;document.getElementById('search-status').innerHTML=`<span class="hit-count">${currentHit+1}/${total}</span> resultado${total!==1?'s':''}`;}
+  function highlightCurrent(){if(currentHit<0||!allHits[currentHit])return;allHits[currentHit].classList.add('current');allHits[currentHit].scrollIntoView({behavior:'smooth',block:'center'});}
+  function clearSearch(){document.getElementById('search-input').value='';clearMarks();allHits=[];currentHit=-1;document.getElementById('search-status').innerHTML='';document.getElementById('btn-prev').disabled=true;document.getElementById('btn-next').disabled=true;}
+  function clearMarks(){document.querySelectorAll('mark.search-hit').forEach(mark=>{const parent=mark.parentNode;parent.replaceChild(document.createTextNode(mark.textContent),mark);parent.normalize()});}
+  function getTextNodes(el){const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{acceptNode(node){const tag=node.parentElement?.tagName?.toLowerCase();if(['script','style'].includes(tag))return NodeFilter.FILTER_REJECT;if(!node.nodeValue.trim())return NodeFilter.FILTER_SKIP;return NodeFilter.FILTER_ACCEPT;}});const nodes=[];let n;while((n=walker.nextNode()))nodes.push(n);return nodes;}
+  function markTextNode(textNode,regex){const text=textNode.nodeValue;const frag=document.createDocumentFragment();let lastIdx=0,match;const marks=[];regex.lastIndex=0;while((match=regex.exec(text))!==null){if(match.index>lastIdx)frag.appendChild(document.createTextNode(text.slice(lastIdx,match.index)));const mark=document.createElement('mark');mark.className='search-hit';mark.textContent=match[0];frag.appendChild(mark);marks.push(mark);lastIdx=regex.lastIndex;}if(lastIdx<text.length)frag.appendChild(document.createTextNode(text.slice(lastIdx)));if(marks.length>0)textNode.parentNode.replaceChild(frag,textNode);return marks;}
+  function highlightNode(el,regex){getTextNodes(el).forEach(n=>{regex.lastIndex=0;markTextNode(n,regex)});}
+  function escapeRegex(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+  function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function searchKeyNav(e){if(e.key==='Enter'){if(e.shiftKey)navHit(-1);else navHit(1);}if(e.key==='Escape')toggleSearch();}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&searchOpen)toggleSearch();});
+
+  const popup=document.getElementById('tip-popup');
+  let tipTimeout;
+  document.querySelectorAll('.tip').forEach(el=>{
+    el.addEventListener('mouseenter',e=>showTip(e,el));
+    el.addEventListener('mousemove',e=>moveTip(e));
+    el.addEventListener('mouseleave',hideTip);
+  });
+  function showTip(e,el){clearTimeout(tipTimeout);const text=el.dataset.tip||'';const imgSrc=el.dataset.img||'';let html=text?`<span>${escapeHtml(text)}</span>`:'';if(imgSrc)html+=`<img src="${imgSrc}" alt="ejemplo">`;if(!html)return;popup.innerHTML=html;popup.classList.add('visible');positionTip(e);}
+  function moveTip(e){positionTip(e);}
+  function hideTip(){tipTimeout=setTimeout(()=>popup.classList.remove('visible'),80);}
+  function positionTip(e){const GAP=14,pw=popup.offsetWidth,ph=popup.offsetHeight,vw=window.innerWidth,vh=window.innerHeight;let x=e.clientX+GAP,y=e.clientY-ph-GAP,dir='up';if(y<8){y=e.clientY+GAP;dir='down';}if(x+pw>vw-8)x=vw-pw-8;if(x<8)x=8;popup.classList.remove('dir-up','dir-down');popup.classList.add('dir-'+dir);popup.style.left=x+'px';popup.style.top=y+'px';}
+</script>
+</body>
+</html>
